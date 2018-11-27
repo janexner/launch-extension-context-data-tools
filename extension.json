@@ -1,0 +1,37 @@
+{
+  "displayName": "Analytics contextData Variable Tools",
+  "name": "ags055-analytics-contextdata-variable-tools",
+  "platform": "web",
+  "version": "1.0.0",
+  "description": "Provides Actions and Tools around Analytics contextData variables.",
+  "author": {
+    "name": "Adobe Consulting, Jan Exner",
+    "email": "jexner@adobe.com"
+  },
+  "viewBasePath": "src/view/",
+  "actions": [
+    {
+      "displayName": "Set Context Data Variables",
+      "name": "set-context-data-variables",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {}
+      },
+      "libPath": "src/lib/actions/setContextDataVariables.js",
+      "viewPath": "actions/setContextDataVariables.html"
+    },
+    {
+      "displayName": "Copy to Context Data Variables",
+      "name": "copy-to-context-data-variables",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {}
+      },
+      "libPath": "src/lib/actions/copyToContextDataVariables.js",
+      "viewPath": "actions/copyToContextDataVariables.html"
+    }
+  ],
+  "iconPath": "resources/icons/logo.svg"
+}

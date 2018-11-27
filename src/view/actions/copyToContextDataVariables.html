@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Action</title>
+  </head>
+  <body>
+    <p>
+      This Action will copy data from all custom Analytics variables (eVars, props, events, ...) 
+      into contextData. You can select which of those should be copied.
+    </p>
+
+    <p>
+      <em>Note:</em> use this Action in a Rule that fires <em>after</em> all <code>setVariables</code> 
+      Actions but <em>before</em> <code>sendBeacon</code> Action(s)!
+    </p>
+
+    <p>Namespace for contextData (optional) <input id="namespace" /> <span class="button" id="btnNamespace">DE</span></p>
+
+    <p>Copy the following:</p>
+
+    <p>
+      <input type="checkbox" id="products" value="products" disabled />
+      <label for="products">Products Variable</label>
+    </p>
+    <p>
+      <input type="checkbox" id="campaign" value="campaign" checked />
+      <label for="campaign">Tracking Code Variable / campaign</label>
+    </p>
+    <p>
+      <input type="checkbox" id="eVars" value="eVars" checked />
+      <label for="eVars">Custom Commerce Variables / eVars</label>
+    </p>
+    <p>
+      <input type="checkbox" id="listVars" value="listVars" checked />
+      <label for="listVars">List Variables</label>
+    </p>
+    <p>
+      <input type="checkbox" id="events" value="events" checked />
+      <label for="events">Success Events</label>
+    </p>
+    <p>
+      <input type="checkbox" id="page" value="page" checked />
+      <label for="page">Page, Site Section, and Server</label>
+    </p>
+    <p>
+      <input type="checkbox" id="props" value="props" checked />
+      <label for="props">Custom Traffic Variables / props</label>
+    </p>
+    <p>
+      <input type="checkbox" id="hier" value="hier" />
+      <label for="hier">Hierarchy Variables</label>
+    </p>
+
+    <script src="https://assets.adobedtm.com/activation/reactor/extensionbridge/extensionbridge.min.js"></script>
+    <script>
+      window.extensionBridge.register({
+        init: function(info) {
+          if (info.settings) {
+            // TODO Populate form values from persisted settings.
+          }
+        },
+
+        getSettings: function() {
+          // TODO Return settings object from form values.
+        },
+
+        validate: function() {
+          // TODO Return whether settings are valid.
+        }
+      });
+    </script>
+    <script>
+      var btnNamespace = document.querySelector('#btnNamespace');
+      btnNamespace.addEventListener('click', function(event) {
+        window.extensionBridge.openDataElementSelector().then(function(dataElement) {
+          document.querySelector('#namespace').value = dataElement;
+        });
+      });
+    </script>
+  </body>
+</html>
