@@ -3,6 +3,11 @@
   <head>
     <meta charset="UTF-8">
     <title>Action</title>
+    <style>
+      .weg {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <p>
@@ -17,39 +22,76 @@
 
     <p>Namespace for contextData (optional) <input id="namespace" /> <span class="button" id="btnNamespace">DE</span></p>
 
-    <p>Copy the following:</p>
+    <div id="lotsOfCheckboxes">
+      <p>Copy the following:</p>
+
+      <p class="weg">
+        <input type="checkbox" class="copybox" id="products" value="products" disabled />
+        <label for="products">Products Variable / s.products</label>
+        <span class="delbox weg">(&amp; <input type="checkbox" id="delproducts" disabled />
+        <label for="delproducts">remove s.products from tracking call</label>)</span>
+      </p>
+      <p>
+        <input type="checkbox" class="copybox" id="campaign" value="campaign" checked />
+        <label for="campaign">Tracking Code Variable / s.campaign</label>
+        <span class="delbox">(&amp; <input type="checkbox" id="delcampaign" />
+        <label for="delcampaign">remove s.campaign from tracking call</label>)</span>
+      </p>
+      <p>
+        <input type="checkbox" class="copybox" id="eVars" value="eVars" checked />
+        <label for="eVars">Custom Commerce Variables / eVars</label>
+        <span class="delbox">(&amp; <input type="checkbox" id="deleVars" />
+        <label for="deleVars">remove eVars from tracking call</label>)</span>
+      </p>
+      <p>
+        <input type="checkbox" class="copybox" id="listVars" value="listVars" checked />
+        <label for="listVars">List Variables</label>
+        <span class="delbox">(&amp; <input type="checkbox" id="dellistVars" />
+        <label for="dellistVars">remove listVars from tracking call</label>)</span>
+      </p>
+      <p>
+        <input type="checkbox" class="copybox" id="builtInEvents" value="builtInEvents" checked />
+        <label for="builtInEvents">Built-in Success Events</label>
+        <span class="delbox">(&amp; <input type="checkbox" id="delbuiltInEvents" />
+        <label for="delbuiltInEvents">remove built-in events from tracking call</label>)</span>
+      </p>
+      <p>
+        <input type="checkbox" class="copybox" id="events" value="events" checked />
+        <label for="events">Custom Success Events</label>
+        <span class="delbox">(&amp; <input type="checkbox" id="delevents" />
+        <label for="delevents">remove custom events from tracking call</label>)</span>
+      </p>
+      <p>
+        <input type="checkbox" class="copybox" id="page" value="page" checked />
+        <label for="page">Page, Site Section, and Server</label>
+        <span class="delbox">(&amp; <input type="checkbox" id="delpage" />
+        <label for="delpage">remove page, site section, and server from tracking call</label>)</span>
+      </p>
+      <p>
+        <input type="checkbox" class="copybox" id="props" value="props" checked />
+        <label for="props">Custom Traffic Variables / props</label>
+        <span class="delbox">(&amp; <input type="checkbox" id="delprops" />
+        <label for="delprops">remove props from tracking call</label>)</span>
+      </p>
+      <p>
+        <input type="checkbox" class="copybox" id="hier" value="hier" />
+        <label for="hier">Hierarchy Variables</label>
+        <span class="delbox">(&amp; <input type="checkbox" id="delhier" />
+        <label for="delhier">remove hier from tracking call</label>)</span>
+      </p>
+    </div>
+
+    <hr/>
+
+    <strong>Example:</strong>
 
     <p>
-      <input type="checkbox" id="products" value="products" disabled />
-      <label for="products">Products Variable</label>
+      A tracking call with the following elements:<br>
+      <code>.../b/ss/rsid/10/?AQB=1&amp;pageName=Home&amp;v1=en&amp;AQE=1</code>
     </p>
     <p>
-      <input type="checkbox" id="campaign" value="campaign" checked />
-      <label for="campaign">Tracking Code Variable / campaign</label>
-    </p>
-    <p>
-      <input type="checkbox" id="eVars" value="eVars" checked />
-      <label for="eVars">Custom Commerce Variables / eVars</label>
-    </p>
-    <p>
-      <input type="checkbox" id="listVars" value="listVars" checked />
-      <label for="listVars">List Variables</label>
-    </p>
-    <p>
-      <input type="checkbox" id="events" value="events" checked />
-      <label for="events">Success Events</label>
-    </p>
-    <p>
-      <input type="checkbox" id="page" value="page" checked />
-      <label for="page">Page, Site Section, and Server</label>
-    </p>
-    <p>
-      <input type="checkbox" id="props" value="props" checked />
-      <label for="props">Custom Traffic Variables / props</label>
-    </p>
-    <p>
-      <input type="checkbox" id="hier" value="hier" />
-      <label for="hier">Hierarchy Variables</label>
+      with the settings above would end up looking like this:<br> 
+      <code>.../b/ss/rsid/10/?AQB=1&amp;<span id="exdelpage">pageName=Home&amp;</span><span id="exdeleVars">v1=en&amp;</span>c.&amp;<span id="exnamespaceon"></span><span id="excopypage">pageName=Home&amp;</span><span id="excopyeVars">eVar1=en&amp;</span><span id="exnamespaceoff"></span>.c&amp;AQE=1</code>
     </p>
 
     <script src="https://assets.adobedtm.com/activation/reactor/extensionbridge/extensionbridge.min.js"></script>
@@ -57,16 +99,58 @@
       window.extensionBridge.register({
         init: function(info) {
           if (info.settings) {
-            // TODO Populate form values from persisted settings.
+            document.querySelector('#namespace').value = info.settings.namespace || '';
+            initElement('products', info.settings.products);
+            initElement('campaign', info.settings.campaign);
+            initElement('eVars', info.settings.eVars);
+            initElement('listVars', info.settings.listVars);
+            initElement('builtInEvents', info.settings.builtInEvents);
+            initElement('events', info.settings.events);
+            initElement('page', info.settings.page);
+            initElement('hier', info.settings.hier);
           }
         },
 
         getSettings: function() {
-          // TODO Return settings object from form values.
+          return {
+            'namespace': document.querySelector('#namespace').value,
+            'products': {
+              'copy': Boolean(document.querySelector('#products').checked),
+              'delete': Boolean(document.querySelector('#delproducts').checked)
+            },
+            'campaign': {
+              'copy': Boolean(document.querySelector('#campaign').checked),
+              'delete': Boolean(document.querySelector('#delcampaign').checked)
+            },
+            'eVars': {
+              'copy': Boolean(document.querySelector('#eVars').checked),
+              'delete': Boolean(document.querySelector('#deleVars').checked)
+            },
+            'listVars': {
+              'copy': Boolean(document.querySelector('#listVars').checked),
+              'delete': Boolean(document.querySelector('#dellistVars').checked)
+            },
+            'builtInEvents': {
+              'copy': Boolean(document.querySelector('#builtInEvents').checked),
+              'delete': Boolean(document.querySelector('#delbuiltInEvents').checked)
+            },
+            'events': {
+              'copy': Boolean(document.querySelector('#events').checked),
+              'delete': Boolean(document.querySelector('#delevents').checked)
+            },
+            'page': {
+              'copy': Boolean(document.querySelector('#page').checked),
+              'delete': Boolean(document.querySelector('#delpage').checked)
+            },
+            'hier': {
+              'copy': Boolean(document.querySelector('#hier').checked),
+              'delete': Boolean(document.querySelector('#delhier').checked)
+            }
+          }
         },
 
         validate: function() {
-          // TODO Return whether settings are valid.
+          return true;
         }
       });
     </script>
@@ -77,6 +161,74 @@
           document.querySelector('#namespace').value = dataElement;
         });
       });
+      document.querySelector('#lotsOfCheckboxes').addEventListener('change', function(event) {
+        if (event.target.classList.contains('copybox')) {
+          const boxid = event.target.id;
+          const delboxid = '#del' + boxid;
+          const available = document.querySelector('#' + boxid).checked;
+          const delbox = document.querySelector(delboxid);
+          delbox.disabled = !available;
+          hideOrShow(delbox, available);
+          // for the example
+          hideOrShowExample(boxid, available);
+        } else if (event.target.id === 'delpage') {
+          if (event.target.checked) {
+            document.querySelector('#exdelpage').classList.add('weg');
+          } else {
+            document.querySelector('exdelpage').classList.remove('weg');
+          }          
+        } else if (event.target.id === 'deleVars') {
+          if (event.target.checked) {
+            document.querySelector('#exdeleVars').classList.add('weg');
+          } else {
+            document.querySelector('#exdeleVars').classList.remove('weg');
+          }
+        }
+      });
+
+      // also for the example
+      const fldNamespace = document.querySelector('#namespace');
+      fldNamespace.addEventListener('blur', function(event) {
+        const ns = fldNamespace.value;
+        if ('undefined' !== ns && ns) {
+          document.querySelector('#exnamespaceon').innerHTML = ns + '.&amp;';
+          document.querySelector('#exnamespaceoff').innerHTML = '.' + ns + '&amp;';
+        } else {
+          document.querySelector('#exnamespaceon').innerHTML = '';
+          document.querySelector('#exnamespaceoff').innerHTML = '';
+        }
+      });
+
+      function initElement(elementId, settings) {
+        const delElementId = "del" + elementId;
+        document.querySelector('#' + elementId).checked = settings.copy;
+        const delElement = document.querySelector('#' + delElementId);
+        hideOrShow(delElement, settings.copy);
+        delElement.checked = settings.delete;
+      }
+
+      function hideOrShow(element, visible) {
+        if ('undefined' !== typeof element && element) {
+          if (visible) {
+            element.parentElement.classList.remove('weg');
+          } else {
+            element.parentElement.classList.add('weg');
+          }
+        }
+      }
+
+      function hideOrShowExample(element, copy) {
+        if ('page' == element || 'eVars' == element) {
+          const spanCopyId = '#excopy' + element;
+          const spanDelId = '#exdel' + element;
+          if (copy) {
+            document.querySelector(spanCopyId).classList.remove('weg');
+          } else {
+            document.querySelector(spanCopyId).classList.add('weg');
+            document.querySelector(spanDelId).classList.remove('weg');
+          }
+        }
+      }
     </script>
   </body>
 </html>
