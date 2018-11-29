@@ -7,12 +7,21 @@
       .weg {
         display: none;
       }
+      #originalParams, #newParams {
+        color: navy;
+      }
+      #renamesourcenumber {
+        width: 3rem;
+      }
     </style>
+    <script>
+      const mappingTable = {};
+    </script>
   </head>
   <body>
     <p>
       This Action will copy data from all custom Analytics variables (eVars, props, events, ...) 
-      into contextData. You can select which of those should be copied.
+      into contextData. You can select which of those should be copied. You can also rename some of them.
     </p>
 
     <p>
@@ -23,62 +32,80 @@
     <p>Namespace for contextData (optional) <input id="namespace" /> <span class="button" id="btnNamespace">DE</span></p>
 
     <div id="lotsOfCheckboxes">
-      <p>Copy the following:</p>
+      <h4>Copy the following:</h4>
 
-      <p class="weg">
-        <input type="checkbox" class="copybox" id="products" value="products" disabled />
-        <label for="products">Products Variable / s.products</label>
-        <span class="delbox weg">(&amp; <input type="checkbox" id="delproducts" disabled />
-        <label for="delproducts">remove s.products from tracking call</label>)</span>
+      <p>
+        <input type="checkbox" class="copybox" id="page" value="page" checked />
+        <label for="page">Page, Site Section, and Server</label>
+        <span class="delbox">(<input type="checkbox" id="delpage" />
+        <label for="delpage">remove page, site section, and server from tracking call</label>)</span>
       </p>
       <p>
         <input type="checkbox" class="copybox" id="campaign" value="campaign" checked />
         <label for="campaign">Tracking Code Variable / s.campaign</label>
-        <span class="delbox">(&amp; <input type="checkbox" id="delcampaign" />
+        <span class="delbox">(<input type="checkbox" id="delcampaign" />
         <label for="delcampaign">remove s.campaign from tracking call</label>)</span>
       </p>
       <p>
         <input type="checkbox" class="copybox" id="eVars" value="eVars" checked />
         <label for="eVars">Custom Commerce Variables / eVars</label>
-        <span class="delbox">(&amp; <input type="checkbox" id="deleVars" />
+        <span class="delbox">(<input type="checkbox" id="deleVars" />
         <label for="deleVars">remove eVars from tracking call</label>)</span>
       </p>
       <p>
         <input type="checkbox" class="copybox" id="listVars" value="listVars" checked />
         <label for="listVars">List Variables</label>
-        <span class="delbox">(&amp; <input type="checkbox" id="dellistVars" />
+        <span class="delbox">(<input type="checkbox" id="dellistVars" />
         <label for="dellistVars">remove listVars from tracking call</label>)</span>
       </p>
       <p>
         <input type="checkbox" class="copybox" id="builtInEvents" value="builtInEvents" checked />
         <label for="builtInEvents">Built-in Success Events</label>
-        <span class="delbox">(&amp; <input type="checkbox" id="delbuiltInEvents" />
+        <span class="delbox">(<input type="checkbox" id="delbuiltInEvents" />
         <label for="delbuiltInEvents">remove built-in events from tracking call</label>)</span>
       </p>
       <p>
         <input type="checkbox" class="copybox" id="events" value="events" checked />
         <label for="events">Custom Success Events</label>
-        <span class="delbox">(&amp; <input type="checkbox" id="delevents" />
+        <span class="delbox">(<input type="checkbox" id="delevents" />
         <label for="delevents">remove custom events from tracking call</label>)</span>
-      </p>
-      <p>
-        <input type="checkbox" class="copybox" id="page" value="page" checked />
-        <label for="page">Page, Site Section, and Server</label>
-        <span class="delbox">(&amp; <input type="checkbox" id="delpage" />
-        <label for="delpage">remove page, site section, and server from tracking call</label>)</span>
       </p>
       <p>
         <input type="checkbox" class="copybox" id="props" value="props" checked />
         <label for="props">Custom Traffic Variables / props</label>
-        <span class="delbox">(&amp; <input type="checkbox" id="delprops" />
+        <span class="delbox">(<input type="checkbox" id="delprops" />
         <label for="delprops">remove props from tracking call</label>)</span>
       </p>
       <p>
         <input type="checkbox" class="copybox" id="hier" value="hier" />
         <label for="hier">Hierarchy Variables</label>
-        <span class="delbox">(&amp; <input type="checkbox" id="delhier" />
+        <span class="delbox">(<input type="checkbox" id="delhier" />
         <label for="delhier">remove hier from tracking call</label>)</span>
       </p>
+    </div>
+
+    <h4>Rename Variables</h4>
+
+    <div id="renameboxes">
+      <p>
+        <select id="renamesource">
+          <option value="" disabled selected>Please select a variable</option>
+          <option>pageName</option>
+          <option>eVar</option>
+          <option>prop</option>
+          <option>event</option>
+          <option>campaign</option>
+          <option>channel</option>
+          <option>server</option>
+        </select><input type="number" id="renamesourcenumber" class="weg" /> becomes <input type="text" id="renametarget" />
+        <button id="renamesubmit" type="submit">Add</button>
+      </p>
+      <table id="mappings" class="weg">
+        <thead>
+          <tr><th>Variable</th><th>&nbsp</th><th>contextData Variable Name</th><th>&nbsp</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
 
     <hr/>
@@ -87,11 +114,11 @@
 
     <p>
       A tracking call with the following elements:<br>
-      <code>.../b/ss/rsid/10/?AQB=1&amp;pageName=Home&amp;v1=en&amp;AQE=1</code>
+      <code>tracking.server/b/ss/rsid/10/s12345?AQB=1<span id="originalParams"></span>&amp;AQE=1</code>
     </p>
     <p>
       with the settings above would end up looking like this:<br> 
-      <code>.../b/ss/rsid/10/?AQB=1&amp;<span id="exdelpage">pageName=Home&amp;</span><span id="exdeleVars">v1=en&amp;</span>c.&amp;<span id="exnamespaceon"></span><span id="excopypage">pageName=Home&amp;</span><span id="excopyeVars">eVar1=en&amp;</span><span id="exnamespaceoff"></span>.c&amp;AQE=1</code>
+      <code>tracking.server/b/ss/rsid/10/s12345?AQB=1<span id="newParams"></span>&amp;AQE=1</code>
     </p>
 
     <script src="https://assets.adobedtm.com/activation/reactor/extensionbridge/extensionbridge.min.js"></script>
@@ -100,7 +127,6 @@
         init: function(info) {
           if (info.settings) {
             document.querySelector('#namespace').value = info.settings.namespace || '';
-            initElement('products', info.settings.products);
             initElement('campaign', info.settings.campaign);
             initElement('eVars', info.settings.eVars);
             initElement('listVars', info.settings.listVars);
@@ -108,53 +134,60 @@
             initElement('events', info.settings.events);
             initElement('page', info.settings.page);
             initElement('hier', info.settings.hier);
+            if ('undefined' !== typeof info.settings.mappings && info.settings.mappings) {
+              for (var mapping in info.settings.mappings) {
+                addMapping(mapping, info.settings.mappings[mapping]);
+              }
+            }
+            showMappings();
+            showExample();
           }
         },
 
         getSettings: function() {
-          return {
-            'namespace': document.querySelector('#namespace').value,
-            'products': {
-              'copy': Boolean(document.querySelector('#products').checked),
-              'delete': Boolean(document.querySelector('#delproducts').checked)
-            },
-            'campaign': {
-              'copy': Boolean(document.querySelector('#campaign').checked),
-              'delete': Boolean(document.querySelector('#delcampaign').checked)
-            },
-            'eVars': {
-              'copy': Boolean(document.querySelector('#eVars').checked),
-              'delete': Boolean(document.querySelector('#deleVars').checked)
-            },
-            'listVars': {
-              'copy': Boolean(document.querySelector('#listVars').checked),
-              'delete': Boolean(document.querySelector('#dellistVars').checked)
-            },
-            'builtInEvents': {
-              'copy': Boolean(document.querySelector('#builtInEvents').checked),
-              'delete': Boolean(document.querySelector('#delbuiltInEvents').checked)
-            },
-            'events': {
-              'copy': Boolean(document.querySelector('#events').checked),
-              'delete': Boolean(document.querySelector('#delevents').checked)
-            },
-            'page': {
-              'copy': Boolean(document.querySelector('#page').checked),
-              'delete': Boolean(document.querySelector('#delpage').checked)
-            },
-            'hier': {
-              'copy': Boolean(document.querySelector('#hier').checked),
-              'delete': Boolean(document.querySelector('#delhier').checked)
-            }
-          }
+          return getAllSettings();
         },
 
         validate: function() {
-          return true;
+          return true; // TODO
         }
       });
     </script>
     <script>
+      function getAllSettings() {
+        return {
+          'namespace': document.querySelector('#namespace').value,
+          'campaign': {
+            'copy': Boolean(document.querySelector('#campaign').checked),
+            'delete': Boolean(document.querySelector('#delcampaign').checked)
+          },
+          'eVars': {
+            'copy': Boolean(document.querySelector('#eVars').checked),
+            'delete': Boolean(document.querySelector('#deleVars').checked)
+          },
+          'listVars': {
+            'copy': Boolean(document.querySelector('#listVars').checked),
+            'delete': Boolean(document.querySelector('#dellistVars').checked)
+          },
+          'builtInEvents': {
+            'copy': Boolean(document.querySelector('#builtInEvents').checked),
+            'delete': Boolean(document.querySelector('#delbuiltInEvents').checked)
+          },
+          'events': {
+            'copy': Boolean(document.querySelector('#events').checked),
+            'delete': Boolean(document.querySelector('#delevents').checked)
+          },
+          'page': {
+            'copy': Boolean(document.querySelector('#page').checked),
+            'delete': Boolean(document.querySelector('#delpage').checked)
+          },
+          'hier': {
+            'copy': Boolean(document.querySelector('#hier').checked),
+            'delete': Boolean(document.querySelector('#delhier').checked)
+          },
+          'mappings': mappingTable
+        }
+      }
       var btnNamespace = document.querySelector('#btnNamespace');
       btnNamespace.addEventListener('click', function(event) {
         window.extensionBridge.openDataElementSelector().then(function(dataElement) {
@@ -169,33 +202,7 @@
           const delbox = document.querySelector(delboxid);
           delbox.disabled = !available;
           hideOrShow(delbox, available);
-          // for the example
-          hideOrShowExample(boxid, available);
-        } else if (event.target.id === 'delpage') {
-          if (event.target.checked) {
-            document.querySelector('#exdelpage').classList.add('weg');
-          } else {
-            document.querySelector('exdelpage').classList.remove('weg');
-          }          
-        } else if (event.target.id === 'deleVars') {
-          if (event.target.checked) {
-            document.querySelector('#exdeleVars').classList.add('weg');
-          } else {
-            document.querySelector('#exdeleVars').classList.remove('weg');
-          }
-        }
-      });
-
-      // also for the example
-      const fldNamespace = document.querySelector('#namespace');
-      fldNamespace.addEventListener('blur', function(event) {
-        const ns = fldNamespace.value;
-        if ('undefined' !== ns && ns) {
-          document.querySelector('#exnamespaceon').innerHTML = ns + '.&amp;';
-          document.querySelector('#exnamespaceoff').innerHTML = '.' + ns + '&amp;';
-        } else {
-          document.querySelector('#exnamespaceon').innerHTML = '';
-          document.querySelector('#exnamespaceoff').innerHTML = '';
+          //
         }
       });
 
@@ -217,17 +224,151 @@
         }
       }
 
-      function hideOrShowExample(element, copy) {
-        if ('page' == element || 'eVars' == element) {
-          const spanCopyId = '#excopy' + element;
-          const spanDelId = '#exdel' + element;
-          if (copy) {
-            document.querySelector(spanCopyId).classList.remove('weg');
-          } else {
-            document.querySelector(spanCopyId).classList.add('weg');
-            document.querySelector(spanDelId).classList.remove('weg');
+      const addButton = document.querySelector('#renamesubmit');
+      const renameSourceField = document.querySelector('#renamesource');
+      const renameSourceNumberField = document.querySelector('#renamesourcenumber');
+      const renameTargetField = document.querySelector('#renametarget');
+      addButton.addEventListener('click', function(event) {
+        var variable = renameSourceField.value;
+        if ("eVar" == variable || "prop" == variable || "event" == variable) {
+          var num = renameSourceNumberField.value;
+          variable = variable + num;
+        }
+        addMapping(variable, renameTargetField.value);
+      });
+      renameSourceField.addEventListener('change', function(event) {
+        var variable = renameSourceField.value;
+        if ("eVar" == variable || "prop" == variable || "event" == variable) {
+          renameSourceNumberField.classList.remove('weg');
+          renameTargetField.value = '';
+        } else {
+          renameSourceNumberField.classList.add('weg');
+          var mapping = 'undefined' !== typeof mappingTable[variable] && mappingTable[variable] || '';
+          renameTargetField.value = mapping;
+        }
+      });
+      renameSourceNumberField.addEventListener('change', function(event) {
+        var variable = renameSourceField.value;
+        var num = renameSourceNumberField.value;
+        var mapping = 'undefined' !== typeof mappingTable[variable + num] && mappingTable[variable + num] || '';
+        renameTargetField.value = mapping;
+      });
+      renameTargetField.addEventListener('keypress', function(event) {
+        if ('Enter' === event.key) {
+          var variable = renameSourceField.value;
+          if ("eVar" == variable || "prop" == variable || "event" == variable) {
+            var num = renameSourceNumberField.value;
+            variable = variable + num;
+          }
+          addMapping(variable + num, renameTargetField.value);
+        }
+      });
+      function addMapping(variable, mapping) {
+        mappingTable[variable] = mapping;
+        showMappings();
+      }
+      function showMappings() {
+        var linesShown = false;
+        document.querySelector('#mappings').classList.add('weg');
+        document.querySelector('#mappings tbody').innerHTML = '';
+        for (var key in mappingTable) {
+          if (mappingTable.hasOwnProperty(key)) {
+            linesShown = true;
+            var tableRow = document.createElement('tr');
+            var cellVar = document.createElement('td');
+            cellVar.innerHTML = key;
+            tableRow.appendChild(cellVar);
+            var cellArrow = document.createElement('td');
+            cellArrow.innerHTML = '=';
+            tableRow.appendChild(cellArrow);
+            var cellMapping = document.createElement('td');
+            cellMapping.innerHTML = mappingTable[key];
+            tableRow.appendChild(cellMapping);
+            var cellDel = document.createElement('td');
+            var btnDel = document.createElement('button');
+            btnDel.innerHTML = "&times;";
+            btnDel.setAttribute('aria-label', 'Remove mapping');
+            btnDel.classList.add('removeButton');
+            btnDel.addEventListener('click', function(event) {
+              delete mappingTable[event.currentTarget.parentElement.parentElement.children["0"].innerText];
+              showMappings();
+            }, false);
+            cellDel.appendChild(btnDel);
+            tableRow.appendChild(cellDel);
+            document.querySelector('#mappings tbody').appendChild(tableRow);
           }
         }
+        if (linesShown) {
+          document.querySelector('#mappings').classList.remove('weg');
+        }
+      }
+
+      function showExample() {
+        const settings = getAllSettings();
+        const orginalHitVariables = {
+          'pageName': 'Home',
+          'v1': 'en',
+          'events': 'event1,event150'
+        };
+        const newHitVariables = {};
+        var thereWillBeContextData = false;
+        const sourceSpan = document.querySelector('#originalParams');
+        var sourceParams = "";
+        for (var key in orginalHitVariables) {
+          sourceParams = sourceParams + "&amp;" + key + "=" + orginalHitVariables[key];
+        }
+        sourceSpan.innerHTML = sourceParams;
+        var targetParams = "";
+        var targetParamsCD = "";
+        const targetSpan = document.querySelector('#newParams');
+        // translate
+        if (settings.page.copy) {
+          thereWillBeContextData = true;
+          var cdName = getMapping('pageName');
+          targetParamsCD = targetParamsCD + "&amp;" + cdName + "=" + orginalHitVariables['pageName'];
+          if (!settings.page.delete) {
+            targetParams = targetParams + "&amp;pageName=" + orginalHitVariables['pageName'];
+          }
+        }
+        if (settings.eVars.copy) {
+          thereWillBeContextData = true;
+          var cdName = getMapping('eVar1');
+          targetParamsCD = targetParamsCD + "&amp;" + cdName + "=" + orginalHitVariables['v1'];
+          if (!settings.eVars.delete) {
+            targetParams = targetParams + "&amp;v1=" + orginalHitVariables['v1'];
+          }
+        }
+        if (settings.events.copy) {
+          thereWillBeContextData = true;
+          const events = orginalHitVariables['events'].split(',');
+          for (let i = 0; i < events.length; i++) {
+            var evName = getMapping(events[i]);
+            targetParamsCD = targetParamsCD + "&amp;" + evName + "=1";
+          }
+          if (!settings.events.delete) {
+            targetParams = targetParams + "&amp;events=" + orginalHitVariables['events'];
+          }
+        }
+        if (thereWillBeContextData) {
+          var resultingTargetParams = targetParams + "&amp;c.";
+          var ns = "";
+          if ('undefined' !== typeof settings.namespace && settings.namespace) {
+            ns = settings.namespace;
+            resultingTargetParams = resultingTargetParams + "&amp;" + ns + ".";
+          }
+          resultingTargetParams = resultingTargetParams + targetParamsCD;
+          if (ns) {
+            resultingTargetParams = resultingTargetParams + "&amp;." + ns;
+          }
+          resultingTargetParams = resultingTargetParams + "&amp;.c";
+          targetSpan.innerHTML = resultingTargetParams;
+        }
+      }
+      function getMapping(variable) {
+        if ('undefined' !== typeof mappingTable[variable] && mappingTable[variable]) {
+          return encodeURIComponent(mappingTable[variable]);
+        }
+        return variable;
       }
     </script>
   </body>
