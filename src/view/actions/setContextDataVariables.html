@@ -3,27 +3,208 @@
   <head>
     <meta charset="UTF-8">
     <title>Action</title>
+    <style>
+      .weg {
+        display: none;
+      }
+    </style>
+    <script>
+      var contextDataVarList = {};
+      var namespace = '';
+    </script>
   </head>
   <body>
-    Action Template
+    <section>
+      <p>
+        Namespace for contextData (optional)
+        <input id="namespace" />
+        <button id="btnNamespace">Use Data Element</button>
+      </p>
+    </section>
+
+    <section>
+      <h4>Assign contextData variables</h4>
+      <p>
+        contextData['<span class="weg" id="nsout"><span id="nsin"></span>.</span>
+        <input type="text" id="cdName" />'] = '<input type="text" id="cdValue" />'
+        <button id="btnValueDE">Data Element</button>
+        <button type="submit" id="cdAdd">Add</button>
+      </p>
+    </section>
+
+    <section>
+      <h4 id="cdVarHeader" class="weg">Active contextData variables</h4>
+      <div id="cdVarList"></div>
+    </section>
 
     <script src="https://assets.adobedtm.com/activation/reactor/extensionbridge/extensionbridge.min.js"></script>
     <script>
       window.extensionBridge.register({
         init: function(info) {
           if (info.settings) {
-            // TODO Populate form values from persisted settings.
+            namespace = info.settings.namespace || '';
+            document.querySelector('#namespace').value = namespace;
+            if ('' === namespace) {
+              document.querySelector('#nsout').classList.add('weg');
+            } else {
+              document.querySelector('#nsin').innerHTML = namespace;
+              document.querySelector('#nsout').classList.remove('weg');
+            }
+            contextDataVarList = info.settings.contextData || {};
+            redrawList();
           }
         },
 
         getSettings: function() {
-          // TODO Return settings object from form values.
+          return {
+            'namespace': document.querySelector('#namespace').value,
+            'contextData': contextDataVarList
+          }
         },
 
         validate: function() {
-          // TODO Return whether settings are valid.
+          return true;
         }
       });
+    </script>
+    <script>
+      const cdVarList = document.querySelector('#cdVarList');
+      const addButton = document.querySelector('#cdAdd');
+      addButton.addEventListener('click', function(event) {
+        addToList();
+      }, false);
+      const valueField = document.querySelector('#cdValue');
+      valueField.addEventListener('keypress', function(event) {
+        if ('Enter' === event.key) {
+          addToList();
+        }
+      }, false);
+      const namespaceField = document.querySelector('#namespace');
+      namespaceField.addEventListener('change', function(event) {
+        namespace = event.target.value;
+        redrawList();
+        if ('' === namespace) {
+          document.querySelector('#nsout').classList.add('weg');
+        } else {
+          document.querySelector('#nsin').innerHTML = namespace;
+          document.querySelector('#nsout').classList.remove('weg');
+        }
+      }, false);
+      const btnNamespaceDataElement = document.querySelector('#btnNamespace');
+      btnNamespaceDataElement.addEventListener('click', function(event) {
+        window.extensionBridge.openDataElementSelector().then(function(dataElement) {
+          document.querySelector('#namespace').value = dataElement;
+        });
+      });
+      const btnValueDataElement = document.querySelector('#btnValueDE');
+      btnValueDataElement.addEventListener('click', function(event) {
+        window.extensionBridge.openDataElementSelector().then(function(dataElement) {
+          document.querySelector('#cdValue').value = dataElement;
+        });
+      });
+
+      // helpers
+      function addToList() {
+        const cdNameField = document.querySelector('#cdName');
+        const cdValueField = document.querySelector('#cdValue');
+        contextDataVarList[cdNameField.value] = cdValueField.value;
+        cdNameField.value = '';
+        cdValueField.value = '';
+        redrawList();
+        cdNameField.focus();
+      }
+
+      function redrawList() {
+        document.querySelector('#cdVarHeader').classList.add('weg');
+        const listHolder = document.querySelector('#cdVarList');
+        listHolder.innerHTML = '';
+        listHolder.classList.add('weg');
+        var hadOne = false;
+        const ns = '' === namespace ? '' : namespace + '.';
+        for (var key in contextDataVarList) {
+          if (contextDataVarList.hasOwnProperty(key)) {
+            hadOne = true;
+            const newLine = document.createElement('p');
+
+            const text1 = document.createElement('text');
+            text1.innerHTML = "contextData['" + ns;
+            newLine.appendChild(text1);
+
+            const newName = document.createElement('text');
+            newName.innerHTML = key;
+            newLine.appendChild(newName);
+
+            const text2 = document.createElement('text');
+            text2.innerHTML = "'] = '";
+            newLine.appendChild(text2);
+
+            const newValue = document.createElement('input');
+            newValue.type = 'text';
+            newValue.id = 'fldValue' + key;
+            newValue.value = contextDataVarList[key];
+            newValue.addEventListener('change', function(event) {
+              const fldID = event.target.id;
+              const btnID = 'btnValueUpdate' + fldID.slice(8);
+              document.querySelector('#' + btnID).disabled = false;
+            }, false);
+            newLine.appendChild(newValue);
+
+            const text3 = document.createElement('text');
+            text3.innerHTML = "'";
+            newLine.appendChild(text3);
+
+            const deButton = document.createElement('button');
+            deButton.id = 'btnValueDE' + key;
+            deButton.innerHTML = 'Data Element';
+            deButton.addEventListener('click', function(event) {
+              const btnID = event.target.id;
+              const key = btnID.slice(10);
+              window.extensionBridge.openDataElementSelector().then( function(dataElement) {
+                contextDataVarList[key] = dataElement;
+                redrawList();
+              });
+            }, false);
+            newLine.appendChild(deButton);
+
+            const text4 = document.createElement('text');
+            text4.innerHTML = '&nbsp;';
+            newLine.appendChild(text4);
+
+            const newUpdateButton = document.createElement('button');
+            newUpdateButton.innerHTML = 'Update';
+            newUpdateButton.id = 'btnValueUpdate' + key;
+            newUpdateButton.disabled = true;
+            newUpdateButton.addEventListener('click', function(event) {
+              const btnID = event.target.id;
+              const key = btnID.slice(14);
+              const fldID = 'fldValue' + key;
+              contextDataVarList[key] = document.querySelector('#' + fldID).value;
+              redrawList();
+            }, false);
+            newLine.appendChild(newUpdateButton);
+
+            newLine.appendChild(text4);
+
+            const newButton = document.createElement('button');
+            newButton.innerHTML = '&times;';
+            newButton.id = 'btnValueDelete' + key;
+            newButton.setAttribute('aria-label', 'Remove this variable');
+            newButton.addEventListener('click', function(event) {
+              const btnID = event.target.id;
+              const key = btnID.slice(14);
+              delete contextDataVarList[key];
+              redrawList();
+            }, false);
+            newLine.appendChild(newButton);
+
+            listHolder.appendChild(newLine);
+          }
+          if (hadOne) {
+            listHolder.classList.remove('weg');
+            document.querySelector('#cdVarHeader').classList.remove('weg');
+          }
+        }
+      }
     </script>
   </body>
 </html>

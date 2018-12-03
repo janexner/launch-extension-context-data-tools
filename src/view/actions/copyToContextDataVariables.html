@@ -194,6 +194,10 @@
           document.querySelector('#namespace').value = dataElement;
         });
       });
+      const namespaceField = document.querySelector('#namespace');
+      namespaceField.addEventListener('change', function(event) {
+        showExample();
+      }, false);
       document.querySelector('#lotsOfCheckboxes').addEventListener('change', function(event) {
         if (event.target.classList.contains('copybox')) {
           const boxid = event.target.id;
@@ -202,8 +206,8 @@
           const delbox = document.querySelector(delboxid);
           delbox.disabled = !available;
           hideOrShow(delbox, available);
-          //
         }
+        showExample();
       });
 
       function initElement(elementId, settings) {
@@ -266,6 +270,7 @@
       function addMapping(variable, mapping) {
         mappingTable[variable] = mapping;
         showMappings();
+        showExample();
       }
       function showMappings() {
         var linesShown = false;
