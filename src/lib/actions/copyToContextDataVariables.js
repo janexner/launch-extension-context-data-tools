@@ -1,6 +1,6 @@
 'use strict';
 
-const builtInVariableList = [
+var builtInVariableList = [
   'campaign',
   'pageName',
   'channel',
@@ -10,100 +10,100 @@ const builtInVariableList = [
   'zip',
   'pageType'
 ];
-const builtInEventsList = [
-  'purchase',
-  'scCheckout',
-  'scAdd',
-  'scView',
-  'scOpen',
-  'scRemove',
-];
-const maxIndexProps = 75;
-const maxIndexEVars = 200;
-const maxIndexEvents = 1000;
+var maxIndexProps = 75;
+var maxIndexEVars = 200;
+var maxIndexListVars = 3;
+var maxIndexHier = 10;
 
-const augmentTracker = turbine.getSharedModule("adobe-analytics","augment-tracker");
+var getTracker = turbine.getSharedModule("adobe-analytics","get-tracker");
 
 module.exports = function(settings) {
+  _satellite.logger.info('Settings: ', settings);
   var namespace = settings.namespace || "";
   if ("" !== namespace) {
     namespace = namespace + ".";
   }
+  var mappings = settings.mappings;
   // recover tracker
-  if (augmentTracker) {
-    augmentTracker( function(tracker) {
-      if (tracker) {
-        // copy built-in variables first
-        for (let i = 0; i < builtInVariableList.length; i++) {
-          const element = builtInVariableList[i];
-          if (weShouldCopy(element)) {
-            copy(tracker, namespace, element);
-          }
+  getTracker().then( function(tracker) {
+    if (tracker) {
+      // copy built-in variables first
+      if (true === settings.page.copy) {
+        for (var i = 0; i < builtInVariableList.length; i++) {
+          var element = builtInVariableList[i];
+          copyOrMove(settings.page.delete, tracker, namespace, element, settings.mappings);
         }
+      }
 
-        // copy built-in events
-        if (weShouldCopy('builtInEvents')) {
-          const events = s.events;
-          if ('undefined' !== events && events) {
-            for (let i = 0; i < builtInEventsList.length; i++) {
-              const event = builtInEventsList[i];
-              if (events.indexOf(event) >= 0) {
-                s.contextData[namespace + event] = event;
+      // copy events
+      if (true === settings.events.copy || true === settings.builtInEvents.copy) {
+        var newEvents = [];
+        var events = tracker.events;
+        if ('undefined' !== events && events) {
+          events = events.split(',');
+          for (var i = 0; i < events.length; i++) {
+            var event = events[i];
+            if ((true === settings.events.copy && event.indexOf('event') == 0) || true === settings.builtInEvents.copy) {
+              var key = event;
+              if ('undefined' !== mappings[event] && mappings[event]) {
+                key = mappings[event];
+              }
+              tracker.contextData[namespace + key] = event;
+              if ((true !== settings.events.delete && event.indexOf('event') == 0) || true !== settings.builtInEvents.delete) {
+                newEvents.push(event);
               }
             }
           }
+          tracker.events = newEvents.join(',');
         }
+      }
 
-        // copy eVars
-        if (weShouldCopy('eVars')) {
-          for (let i = 1; i <= maxIndexEVars; i++) {
-            const eVar = s['v' + i];
-            if ('undefined' !== typeof eVar && eVar) {
-              s.contextData[namespace + 'eVar' + i] = s[eVar];
-            }
-          }
-        }
+      // copy eVars
+      copyOrMoveNumberedVars(settings, tracker, namespace, mappings, 'eVars', 'eVar', maxIndexEVars);
 
-        // copy props
-        if (weShouldCopy('props')) {
-          for (let i = 1; i <= maxIndexProps; i++) {
-            const prop = s['c' + i];
-            if ('undefined' !== typeof prop && prop) {
-              s.contextData[namespace + 'prop' + i] = s[prop];
-            }
-          }
-        }
+      // copy props
+      copyOrMoveNumberedVars(settings, tracker, namespace, mappings, 'props', 'prop', maxIndexProps);
 
-        // copy listVars
-        if (weShouldCopy('listVars')) {
-          copy(s, namespace, 'list1');
-          copy(s, namespace, 'list2');
-          copy(s, namespace, 'list3');
-        }
+      // copy listVars
+      copyOrMoveNumberedVars(settings, tracker, namespace, mappings, 'listVars', 'list', maxIndexListVars);
 
-        // copy events
-        if (weShouldCopy('events')) {
-          const events = s.events;
-          if ('undefined' !== events && events) {
-            for (let i = 1; i <= maxIndexEvents; i++) {
-              const event = 'event' + i;
-              if (events.indexOf(event) >= 0) {
-                s.contextData[namespace + event] = event;
-              }
-            }
-          }
-        }
-      } // if tracker
-  	});
+      // copy hierarchy vars
+      copyOrMoveNumberedVars(settings, tracker, namespace, mappings, 'hier', 'hier', maxIndexHier);
+
+    } else {
+      console.log('tracker not found');
+    } // if tracker
+  });
+}
+
+function copyOrMove(moveInstead, tracker, namespace, variable, mappings) {
+  if ('undefined' !== tracker[variable] && tracker[variable]) {
+    var key = variable;
+    if ('undefined' !== mappings[variable] && mappings[variable]) {
+      key = mappings[variable];
+    }
+    tracker.contextData[namespace + key] = tracker[variable];
+    if (moveInstead && 'pageName' !== variable) {
+      tracker[variable] = '';
+    }
   }
 }
 
-function weShouldCopy(area) {
-  return ('undefined' !== typeof settings[area] && true === settings[area]);
-}
-
-function copy(s, namespace, variable) {
-  if ('undefined' !== typeof s[variable] && s[variable]) {
-    s.contextData[namespace + variable] = s[variable];
+function copyOrMoveNumberedVars(settings, tracker, namespace, mappings, group, vname, maxIndex) {
+  if (true === settings[group].copy) {
+    for (var i = 1; i <= maxIndex; i++) {
+      var effectiveVarName = vname + i;
+      var value = tracker[effectiveVarName];
+      if ('undefined' !== typeof value && value) {
+        console.log('copyOrMoveNumberedVars', group, i, value, tracker);
+        if ('undefined' !== typeof mappings[effectiveVarName] && mappings[effectiveVarName]) {
+          effectiveVarName = mappings[effectiveVarName];
+        }
+        tracker.contextData[namespace + effectiveVarName] = value;
+        if (true === settings[group].delete) {
+          tracker[vname + i] = '';
+        }
+      }
+    }
   }
 }

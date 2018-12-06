@@ -1,8 +1,8 @@
 {
-  "displayName": "Analytics contextData Variable Tools",
+  "displayName": "Analytics contextData Tools",
   "name": "ags055-analytics-contextdata-variable-tools",
   "platform": "web",
-  "version": "1.0.0",
+  "version": "1.0.21",
   "description": "Provides Actions and Tools around Analytics contextData variables.",
   "author": {
     "name": "Adobe Consulting, Jan Exner",

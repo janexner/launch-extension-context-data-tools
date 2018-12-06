@@ -1,7 +1,7 @@
 'use strict';
 
 // recover tracker
-const augmentTracker = turbine.getSharedModule("adobe-analytics","augment-tracker");
+var augmentTracker = turbine.getSharedModule("adobe-analytics","augment-tracker");
 
 module.exports = function(settings) {
   var namespace = settings.namespace || "";

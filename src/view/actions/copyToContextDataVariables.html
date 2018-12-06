@@ -29,7 +29,11 @@
       Actions but <em>before</em> <code>sendBeacon</code> Action(s)!
     </p>
 
-    <p>Namespace for contextData (optional) <input id="namespace" /> <span class="button" id="btnNamespace">DE</span></p>
+    <p>
+      Namespace for contextData (optional) 
+      <input id="namespace" /> 
+      <button id="btnNamespace">Use Data Element</button>
+    </p>
 
     <div id="lotsOfCheckboxes">
       <h4>Copy the following:</h4>
@@ -38,7 +42,7 @@
         <input type="checkbox" class="copybox" id="page" value="page" checked />
         <label for="page">Page, Site Section, and Server</label>
         <span class="delbox">(<input type="checkbox" id="delpage" />
-        <label for="delpage">remove page, site section, and server from tracking call</label>)</span>
+        <label for="delpage">remove site section, and server from tracking call</label>)</span>
       </p>
       <p>
         <input type="checkbox" class="copybox" id="campaign" value="campaign" checked />
@@ -127,12 +131,13 @@
         init: function(info) {
           if (info.settings) {
             document.querySelector('#namespace').value = info.settings.namespace || '';
+            initElement('page', info.settings.page);
             initElement('campaign', info.settings.campaign);
             initElement('eVars', info.settings.eVars);
             initElement('listVars', info.settings.listVars);
             initElement('builtInEvents', info.settings.builtInEvents);
             initElement('events', info.settings.events);
-            initElement('page', info.settings.page);
+            initElement('props', info.settings.props);
             initElement('hier', info.settings.hier);
             if ('undefined' !== typeof info.settings.mappings && info.settings.mappings) {
               for (var mapping in info.settings.mappings) {
@@ -157,6 +162,10 @@
       function getAllSettings() {
         return {
           'namespace': document.querySelector('#namespace').value,
+          'page': {
+            'copy': Boolean(document.querySelector('#page').checked),
+            'delete': Boolean(document.querySelector('#delpage').checked)
+          },
           'campaign': {
             'copy': Boolean(document.querySelector('#campaign').checked),
             'delete': Boolean(document.querySelector('#delcampaign').checked)
@@ -177,9 +186,9 @@
             'copy': Boolean(document.querySelector('#events').checked),
             'delete': Boolean(document.querySelector('#delevents').checked)
           },
-          'page': {
-            'copy': Boolean(document.querySelector('#page').checked),
-            'delete': Boolean(document.querySelector('#delpage').checked)
+          'props': {
+            'copy': Boolean(document.querySelector('#props').checked),
+            'delete': Boolean(document.querySelector('#delprops').checked)
           },
           'hier': {
             'copy': Boolean(document.querySelector('#hier').checked),
