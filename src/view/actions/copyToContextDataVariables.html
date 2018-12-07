@@ -36,56 +36,59 @@
     </p>
 
     <div id="lotsOfCheckboxes">
-      <h4>Copy the following:</h4>
+      <h4>Copy or move the following:</h4>
 
-      <p>
-        <input type="checkbox" class="copybox" id="page" value="page" checked />
-        <label for="page">Page, Site Section, and Server</label>
-        <span class="delbox">(<input type="checkbox" id="delpage" />
-        <label for="delpage">remove site section, and server from tracking call</label>)</span>
-      </p>
-      <p>
-        <input type="checkbox" class="copybox" id="campaign" value="campaign" checked />
-        <label for="campaign">Tracking Code Variable / s.campaign</label>
-        <span class="delbox">(<input type="checkbox" id="delcampaign" />
-        <label for="delcampaign">remove s.campaign from tracking call</label>)</span>
-      </p>
-      <p>
-        <input type="checkbox" class="copybox" id="eVars" value="eVars" checked />
-        <label for="eVars">Custom Commerce Variables / eVars</label>
-        <span class="delbox">(<input type="checkbox" id="deleVars" />
-        <label for="deleVars">remove eVars from tracking call</label>)</span>
-      </p>
-      <p>
-        <input type="checkbox" class="copybox" id="listVars" value="listVars" checked />
-        <label for="listVars">List Variables</label>
-        <span class="delbox">(<input type="checkbox" id="dellistVars" />
-        <label for="dellistVars">remove listVars from tracking call</label>)</span>
-      </p>
-      <p>
-        <input type="checkbox" class="copybox" id="builtInEvents" value="builtInEvents" checked />
-        <label for="builtInEvents">Built-in Success Events</label>
-        <span class="delbox">(<input type="checkbox" id="delbuiltInEvents" />
-        <label for="delbuiltInEvents">remove built-in events from tracking call</label>)</span>
-      </p>
-      <p>
-        <input type="checkbox" class="copybox" id="events" value="events" checked />
-        <label for="events">Custom Success Events</label>
-        <span class="delbox">(<input type="checkbox" id="delevents" />
-        <label for="delevents">remove custom events from tracking call</label>)</span>
-      </p>
-      <p>
-        <input type="checkbox" class="copybox" id="props" value="props" checked />
-        <label for="props">Custom Traffic Variables / props</label>
-        <span class="delbox">(<input type="checkbox" id="delprops" />
-        <label for="delprops">remove props from tracking call</label>)</span>
-      </p>
-      <p>
-        <input type="checkbox" class="copybox" id="hier" value="hier" />
-        <label for="hier">Hierarchy Variables</label>
-        <span class="delbox">(<input type="checkbox" id="delhier" />
-        <label for="delhier">remove hier from tracking call</label>)</span>
-      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Copy</th>
+            <th>Move</th>
+            <th>Variables</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox" class="copybox" id="page" value="page" checked /></td>
+            <td class="delbox"><input type="checkbox" id="delpage" /></td>
+            <td>Page, Site Section, and Server</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="copybox" id="campaign" value="campaign" checked /></td>
+            <td class="delbox"><input type="checkbox" id="delcampaign" /></td>
+            <td>Tracking Code Variable / s.campaign</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="copybox" id="eVars" value="eVars" checked /></td>
+            <td class="delbox"><input type="checkbox" id="deleVars" /></td>
+            <td>Custom Commerce Variables / eVars</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="copybox" id="listVars" value="listVars" checked /></td>
+            <td class="delbox"><input type="checkbox" id="dellistVars" /></td>
+            <td>List Variables</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="copybox" id="builtInEvents" value="builtInEvents" checked /></td>
+            <td class="delbox"><input type="checkbox" id="delbuiltInEvents" /></td>
+            <td>Built-in Success Events</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="copybox" id="events" value="events" checked /></td>
+            <td class="delbox"><input type="checkbox" id="delevents" /></td>
+            <td>Custom Success Events</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="copybox" id="props" value="props" checked /></td>
+            <td class="delbox"><input type="checkbox" id="delprops" /></td>
+            <td>Custom Traffic Variables / props</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" class="copybox" id="hier" value="hier" /></td>
+            <td class="delbox"><input type="checkbox" id="delhier" /></td>
+            <td>Hierarchy Variables</td>
+          </tr>
+          </tbody>
+      </table>
     </div>
 
     <h4>Rename Variables</h4>
@@ -230,9 +233,9 @@
       function hideOrShow(element, visible) {
         if ('undefined' !== typeof element && element) {
           if (visible) {
-            element.parentElement.classList.remove('weg');
+            element.classList.remove('weg');
           } else {
-            element.parentElement.classList.add('weg');
+            element.classList.add('weg');
           }
         }
       }
@@ -322,6 +325,7 @@
         const orginalHitVariables = {
           'pageName': 'Home',
           'v1': 'en',
+          'v2': 'ch',
           'events': 'event1,event150'
         };
         const newHitVariables = {};
@@ -340,9 +344,7 @@
           thereWillBeContextData = true;
           var cdName = getMapping('pageName');
           targetParamsCD = targetParamsCD + "&amp;" + cdName + "=" + orginalHitVariables['pageName'];
-          if (!settings.page.delete) {
-            targetParams = targetParams + "&amp;pageName=" + orginalHitVariables['pageName'];
-          }
+          targetParams = targetParams + "&amp;pageName=" + orginalHitVariables['pageName'];
         }
         if (settings.eVars.copy) {
           thereWillBeContextData = true;
@@ -350,6 +352,11 @@
           targetParamsCD = targetParamsCD + "&amp;" + cdName + "=" + orginalHitVariables['v1'];
           if (!settings.eVars.delete) {
             targetParams = targetParams + "&amp;v1=" + orginalHitVariables['v1'];
+          }
+          var cdName = getMapping('eVar2');
+          targetParamsCD = targetParamsCD + "&amp;" + cdName + "=" + orginalHitVariables['v2'];
+          if (!settings.eVars.delete) {
+            targetParams = targetParams + "&amp;v2=" + orginalHitVariables['v2'];
           }
         }
         if (settings.events.copy) {
