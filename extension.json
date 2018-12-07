@@ -2,7 +2,7 @@
   "displayName": "Analytics contextData Tools",
   "name": "ags055-analytics-contextdata-variable-tools",
   "platform": "web",
-  "version": "1.0.21",
+  "version": "1.1.15",
   "description": "Provides Actions and Tools around Analytics contextData variables.",
   "author": {
     "name": "Adobe Consulting, Jan Exner",
@@ -31,6 +31,17 @@
       },
       "libPath": "src/lib/actions/copyToContextDataVariables.js",
       "viewPath": "actions/copyToContextDataVariables.html"
+    },
+    {
+      "displayName": "Set Context Data from DataLayer",
+      "name": "set-context-data-from-data-layer",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {}
+      },
+      "libPath": "src/lib/actions/setContextDataFromDataLayer.js",
+      "viewPath": "actions/setContextDataFromDataLayer.html"
     }
   ],
   "iconPath": "resources/icons/logo.svg"

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Action</title>
+  </head>
+  <body>
+    <section>
+      <p>
+        Namespace for contextData (optional)
+        <input id="namespace" />
+        <button id="btnNamespace">Use Data Element</button>
+      </p>
+    </section>
+
+    <section>
+      <p>
+        Data Layer object (e.g. 'digitalData' for window.digitalData)
+        <input id="dataLayerName" />
+        <button id="btnDataLayerName">Use Data Element</button>
+      </p>
+    </section>
+
+    <section>
+      <p>
+        <input id="joinCharacter" />
+      </p>
+    </section>
+
+    <script src="https://assets.adobedtm.com/activation/reactor/extensionbridge/extensionbridge.min.js"></script>
+    <script>
+      window.extensionBridge.register({
+        init: function(info) {
+          if (info.settings) {
+            var namespace = info.settings.namespace || '';
+            document.querySelector('#namespace').value = namespace;
+            var dataLayerRoot = info.settings.dataLayerRoot;
+            document.querySelector('#dataLayerName').value = dataLayerRoot;
+            var joinCharacter = info.settings.joinCharacter || ',';
+            document.querySelector('#joinCharacter').value = joinCharacter;
+          }
+        },
+
+        getSettings: function() {
+          return {
+            'namespace': document.querySelector('#namespace').value,
+            'dataLayerRoot': document.querySelector('#dataLayerName').value,
+            'joinCharacter': document.querySelector('#joinCharacter').value
+          }
+        },
+
+        validate: function() {
+          return true;
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -18,7 +18,6 @@ var maxIndexHier = 10;
 var getTracker = turbine.getSharedModule("adobe-analytics","get-tracker");
 
 module.exports = function(settings) {
-  _satellite.logger.info('Settings: ', settings);
   var namespace = settings.namespace || "";
   if ("" !== namespace) {
     namespace = namespace + ".";
@@ -95,7 +94,6 @@ function copyOrMoveNumberedVars(settings, tracker, namespace, mappings, group, v
       var effectiveVarName = vname + i;
       var value = tracker[effectiveVarName];
       if ('undefined' !== typeof value && value) {
-        console.log('copyOrMoveNumberedVars', group, i, value, tracker);
         if ('undefined' !== typeof mappings[effectiveVarName] && mappings[effectiveVarName]) {
           effectiveVarName = mappings[effectiveVarName];
         }
