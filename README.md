@@ -2,10 +2,11 @@
 
 Provides Actions and some tools to let you use contextData variables for tracking.
 
-The Extension provides two Actions:
+The Extension provides three Actions:
 
 1. Copy to Context Data Variables
 2. Set Context Data Variables
+3. Set Context Data from Data Layer
 
 Both Actions can be used to set contextData variables, but they are used for different use cases.
 
@@ -39,3 +40,15 @@ s.contextData['pageView']=1;
 ## Set Context Data Variables
 
 This Action does what it says on the tin: it allows you to set contextData to any value, including the value of a Data Element.
+
+## Set Context Data from Data Layer
+
+Configure the Action with the name of your data layer variable (underneath windows!), and it'll read the whole thing and turn it into contextData variables.
+
+### Example
+
+## Notes
+
+All Actions allow you to set a namespace for your contextData.
+
+Setting a namespace is highly recommended. It makes sure there will be no clashes with what other people set, and it'll be easier to find your contextData in the Processing Rule interface.
