@@ -45,7 +45,43 @@ This Action does what it says on the tin: it allows you to set contextData to an
 
 Configure the Action with the name of your data layer variable (underneath windows!), and it'll read the whole thing and turn it into contextData variables.
 
+*Note*: this can lead to pretty long tracking call URLs, depending on the size and depth of your data layer.
+
 ### Example
+
+Consider the following data layer:
+
+```js
+window.digitalData = {
+    'page': {
+        'pageInfo': {
+            'pageName': 'Home',
+            'language': 'en'
+        }
+    },
+    'events': [
+        {
+            'name': 'Page View'
+        },
+        {
+            'name': 'Tab Change',
+            'source': 'main tabs',
+            'tab selected': 'map'
+        }
+    ]
+}
+```
+
+The Action would turn this into the following contextData variables:
+
+```js
+s.contextData['page.pageInfo.pageName'] = 'Home';
+s.contextData['page.pageInfo.language'] = 'en';
+s.contextData['event.0.name'] = 'Page View';
+s.contextData['event.1.name'] = 'Tab change';
+s.contextData['event.1.source'] = 'main tabs';
+s.contextData['event.1.tab selected'] = 'map';
+```
 
 ## Notes
 
