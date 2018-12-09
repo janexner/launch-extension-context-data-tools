@@ -16,7 +16,19 @@
       "schema": {
         "$schema": "http://json-schema.org/draft-04/schema#",
         "type": "object",
-        "properties": {}
+        "properties": {
+          "namespace": {
+            "type": "string"
+          },
+          "contextData": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        },
+        "required": [
+          "contextData"
+        ],
+        "additionalProperties": { "type": "string" }
       },
       "libPath": "src/lib/actions/setContextDataVariables.js",
       "viewPath": "actions/setContextDataVariables.html"
@@ -27,7 +39,117 @@
       "schema": {
         "$schema": "http://json-schema.org/draft-04/schema#",
         "type": "object",
-        "properties": {}
+        "properties": {
+          "namespace": {
+            "type": "string"
+          },
+          "page": {
+            "type": "object",
+            "properties": {
+              "copy": { "type": "boolean" },
+              "delete": { "type": "boolean" }
+            },
+            "required": [
+              "copy",
+              "delete"
+            ]
+          },
+          "campaign": {
+            "type": "object",
+            "properties": {
+              "copy": { "type": "boolean" },
+              "delete": { "type": "boolean" }
+            },
+            "required": [
+              "copy",
+              "delete"
+            ]
+          },
+          "eVars": {
+            "type": "object",
+            "properties": {
+              "copy": { "type": "boolean" },
+              "delete": { "type": "boolean" }
+            },
+            "required": [
+              "copy",
+              "delete"
+            ]
+          },
+          "listVars": {
+            "type": "object",
+            "properties": {
+              "copy": { "type": "boolean" },
+              "delete": { "type": "boolean" }
+            },
+            "required": [
+              "copy",
+              "delete"
+            ]
+          },
+          "builtInEvents": {
+            "type": "object",
+            "properties": {
+              "copy": { "type": "boolean" },
+              "delete": { "type": "boolean" }
+            },
+            "required": [
+              "copy",
+              "delete"
+            ]
+          },
+          "events": {
+            "type": "object",
+            "properties": {
+              "copy": { "type": "boolean" },
+              "delete": { "type": "boolean" }
+            },
+            "required": [
+              "copy",
+              "delete"
+            ]
+          },
+          "props": {
+            "type": "object",
+            "properties": {
+              "copy": { "type": "boolean" },
+              "delete": { "type": "boolean" }
+            },
+            "required": [
+              "copy",
+              "delete"
+            ]
+          },
+          "hier": {
+            "type": "object",
+            "properties": {
+              "copy": { "type": "boolean" },
+              "delete": { "type": "boolean" }
+            },
+            "required": [
+              "copy",
+              "delete"
+            ]
+          },
+          "mappings": {
+            "type": "object",
+            "additionalProperties": { 
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "page",
+          "campaign",
+          "eVars",
+          "listVars",
+          "builtInEvents",
+          "events",
+          "props",
+          "hier",
+          "mappings"
+        ],
+        "additionalProperties": { "type": "string" }
       },
       "libPath": "src/lib/actions/copyToContextDataVariables.js",
       "viewPath": "actions/copyToContextDataVariables.html"
@@ -38,7 +160,23 @@
       "schema": {
         "$schema": "http://json-schema.org/draft-04/schema#",
         "type": "object",
-        "properties": {}
+        "properties": {
+          "namespace": {
+            "type": "string"
+          },
+          "dataLayerRoot": {
+            "type": "string"
+          },
+          "joinCharacter": {
+            "type": "string",
+            "maxLength": 1
+          }
+        },
+        "required": [
+          "dataLayerRoot",
+          "joinCharacter"
+        ],
+        "additionalProperties": { "type": "string" }
       },
       "libPath": "src/lib/actions/setContextDataFromDataLayer.js",
       "viewPath": "actions/setContextDataFromDataLayer.html"
