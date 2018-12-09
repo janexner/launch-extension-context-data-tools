@@ -3,29 +3,45 @@
   <head>
     <meta charset="UTF-8">
     <title>Action</title>
+    <style>
+      td.note {
+        font-style: italic;
+        padding-left: 2rem;
+      }
+    </style>
   </head>
   <body>
     <section>
-      <p>
-        Namespace for contextData (optional)
-        <input id="namespace" />
-        <button id="btnNamespace">Use Data Element</button>
-      </p>
+      <p>This Action will take the complete data layer and track it into contextData. See <a href="https://github.com/janexner/launch-extension-context-data-tools">github</a> for an example.</p>
     </section>
 
     <section>
-      <p>
-        Data Layer object (e.g. 'digitalData' for window.digitalData)
-        <input id="dataLayerName" />
-        <button id="btnDataLayerName">Use Data Element</button>
-      </p>
-    </section>
-
-    <section>
-      <p>
-        Join multiple values (from arrays and such) using
-        <input id="joinCharacter" />
-      </p>
+      <h3>Settings</h3>
+      <table>
+        <tbody>
+          <tr>
+            <td>Namespace for contextData (optional)</td>
+            <td><input id="namespace" /></td>
+            <td><button id="btnNamespace">Use Data Element</button></td>
+          </tr>
+          <tr>
+            <td>Data Layer object</td>
+            <td><input id="dataLayerName" /></td>
+            <td><button id="btnDataLayerName">Use Data Element</button></td>
+          </tr>
+          <tr>
+            <td class="note" colspan="3">Example: use 'digitalData' here to access <code>window.digitalData</code></td>
+          </tr>
+          <tr>
+            <td>Join multiple values (from arrays) using</td>
+            <td><input id="joinCharacter" /></td>
+            <td><button id="btnJoinCharacter">Use Data Element</button></td>
+          </tr>
+          <tr>
+            <td class="note" colspan="3">Example: ',' or '|' tend to work well</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
 
     <script src="https://assets.adobedtm.com/activation/reactor/extensionbridge/extensionbridge.min.js"></script>
@@ -54,6 +70,26 @@
           return true;
         }
       });
+    </script>
+    <script>
+      var btnNamespace = document.querySelector('#btnNamespace');
+        btnNamespace.addEventListener('click', function(event) {
+          window.extensionBridge.openDataElementSelector().then(function(dataElement) {
+            document.querySelector('#namespace').value = dataElement;
+          });
+        });
+        var btndataLayerName = document.querySelector('#btnDataLayerName');
+        btndataLayerName.addEventListener('click', function(event) {
+          window.extensionBridge.openDataElementSelector().then(function(dataElement) {
+            document.querySelector('#dataLayerName').value = dataElement;
+          });
+        });
+        var btnJoinCharacter = document.querySelector('#btnJoinCharacter');
+        btnJoinCharacter.addEventListener('click', function(event) {
+          window.extensionBridge.openDataElementSelector().then(function(dataElement) {
+            document.querySelector('#joinCharacter').value = dataElement;
+          });
+        });
     </script>
   </body>
 </html>
