@@ -10,7 +10,8 @@ module.exports = function(settings) {
 
     getTracker().then( function(tracker) {
         if (tracker) {
-            addElementsFromObjectToTrackerRecursively(window[rootElement], [ namespace ], tracker, joinCharacter);
+            var baseNamespace = "" === namespace ? [] : [ namespace ];
+            addElementsFromObjectToTrackerRecursively(window[rootElement], baseNamespace, tracker, joinCharacter);
         } else {
             _satellite.logger.warn('no tracker here!');
         }

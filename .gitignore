@@ -62,3 +62,4 @@ typings/
 
 *.zip
 upload.cmd
+release.cmd
